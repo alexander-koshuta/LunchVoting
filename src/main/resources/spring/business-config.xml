@@ -3,6 +3,8 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -11,11 +13,16 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx.xsd">
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <context:component-scan base-package="lunch.voting.core.repositories.jpa"/>
     <context:component-scan base-package="lunch.voting.core.services"/>
     <context:component-scan base-package="lunch.voting.core.security"/>
+    <context:component-scan base-package="lunch.voting.core.scheduled.tasks"/>
 
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="username" value="sa"/>
@@ -33,10 +40,21 @@
             <map>
                 <entry key="hibernate.hbm2ddl.auto" value="create-drop"/>
                 <entry key="hibernate.show_sql" value="true"/>
+                <entry key="hibernate.jdbc.batch_size" value="20"/>
+                <entry key="hibernate.jdbc.batch_versioned_data" value="true"/>
+                <entry key="hibernate.order_inserts" value="true"/>
+                <entry key="hibernate.order_updates" value="true"/>
             </map>
         </property>
         <property name="packagesToScan" value="lunch.voting.core.models.entities"/>
     </bean>
+
+    <bean id="controllerAspect" class="lunch.voting.core.aspects.VotingLoggingAspect" />
+    <aop:aspectj-autoproxy>
+        <aop:include name="controllerAspect" />
+    </aop:aspectj-autoproxy>
+
+    <task:annotation-driven />
 
     <tx:annotation-driven/>
 

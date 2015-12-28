@@ -2,9 +2,12 @@ package lunch.voting.rest.mvc;
 
 import lunch.voting.core.models.entities.Account;
 import lunch.voting.core.models.entities.Restaurant;
+import lunch.voting.core.models.entities.Role;
 import lunch.voting.core.services.AccountService;
 import lunch.voting.core.services.RestaurantService;
+import lunch.voting.core.services.RoleService;
 import lunch.voting.core.services.exceptions.AccountExistsException;
+import lunch.voting.core.services.exceptions.RoleDoesNotExistException;
 import lunch.voting.rest.exceptions.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- *
+ * This controller represents admin console for managing the application.
+ * Access to it requires admin role authority.
  */
 @RestController
 @RequestMapping("/admin")
@@ -26,16 +30,13 @@ public class AdminController {
 
     private RestaurantService restaurantService;
     private AccountService accountService;
+    private RoleService roleService;
 
     @Autowired
-    public AdminController(RestaurantService restaurantService, AccountService accountService) {
+    public AdminController(RestaurantService restaurantService, AccountService accountService, RoleService roleService) {
         this.restaurantService = restaurantService;
         this.accountService = accountService;
-    }
-
-    @RequestMapping(value = "/testConnection", method = RequestMethod.GET)
-    public ResponseEntity<String> testConnection() {
-        return new ResponseEntity<String>("connection is ok", HttpStatus.OK);
+        this.roleService = roleService;
     }
 
     @RequestMapping(value = "/accounts", method = RequestMethod.GET)
@@ -49,7 +50,7 @@ public class AdminController {
         try {
             Account createdAccount = accountService.createAccount(sentAccount);
             return new ResponseEntity<Account>(createdAccount, HttpStatus.CREATED);
-        } catch(AccountExistsException exception) {
+        } catch(AccountExistsException | RoleDoesNotExistException exception) {
             throw new ConflictException(exception);
         }
     }
@@ -68,5 +69,16 @@ public class AdminController {
         } else {
             return new ResponseEntity<Restaurant>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    /**
+     * This is a convenient method to list all roles for admin UI, probably for a dropdown box which can be used
+     * later for creating user accounts.
+     * @return the list of all existing roles.
+     */
+    @RequestMapping(value = "/roles", method = RequestMethod.GET)
+    public ResponseEntity<List<Role>> getAllRoles() {
+        List<Role> roles = roleService.getAllRoles();
+        return new ResponseEntity<List<Role>>(roles, HttpStatus.OK);
     }
 }

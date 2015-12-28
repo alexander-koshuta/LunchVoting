@@ -1,8 +1,10 @@
 package lunch.voting.core.security;
 
 import lunch.voting.core.models.entities.Account;
+import lunch.voting.core.models.entities.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Collection;
  *
  */
 public class AccountUserDetails implements UserDetails {
+
     private final Account account;
 
     public AccountUserDetails(Account account) {
@@ -20,10 +23,10 @@ public class AccountUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        GrantedAuthority authority = new SimpleGrantedAuthority(account.getRole());
-
         ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(authority);
+        for(Role role : account.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getType().name()));
+        }
         return authorities;
     }
 
@@ -55,5 +58,17 @@ public class AccountUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public static String getPrincipal(){
+        String userName = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails)principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
     }
 }

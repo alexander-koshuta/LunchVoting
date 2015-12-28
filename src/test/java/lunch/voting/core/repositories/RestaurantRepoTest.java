@@ -1,7 +1,6 @@
-package junch.voting.core.repositories;
+package lunch.voting.core.repositories;
 
 import lunch.voting.core.models.entities.Restaurant;
-import lunch.voting.core.repositories.RestaurantRepo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +9,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,5 +47,12 @@ public class RestaurantRepoTest {
         assertNotNull(restaurant);
         assertEquals(restaurant.getTitle(), "test restaurant");
         assertEquals(restaurant.getAddress(), "test address");
+    }
+
+    @Test
+    @Transactional
+    public void testFindAll() {
+        List<Restaurant> list = repo.findAll();
+        assertEquals(list.size(), 1);
     }
 }
