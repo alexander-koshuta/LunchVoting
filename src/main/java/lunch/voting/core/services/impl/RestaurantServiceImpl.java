@@ -54,7 +54,7 @@ public class RestaurantServiceImpl implements RestaurantService {
             result = vote(account, restaurantId);
         } else {
             // check if he is not voting for the same restaurant
-            if (account.getVotedRestaurant() == restaurantId) {
+            if (account.getVotedRestaurant().equals(restaurantId)) {
                 throw new AlreadyVotedException("Voting for the same restaurant again.");
             }
             // check the time
