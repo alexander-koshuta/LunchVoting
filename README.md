@@ -1,6 +1,6 @@
 # LunchVoting
 
-Application is using H2 in memory instance and tomcat7 plugin.
+Application is using H2 in memory instance and tomcat7 plugin. It requires jdk 1.8 (java 8 Date API was used).
 
 RESTful API is located in classes: AdminController, VotingController and TestController(for tests only, it's not
 intended for production builds).
